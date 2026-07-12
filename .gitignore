@@ -42,6 +42,13 @@ lerna-debug.log*
 .env.production.local
 .env.local
 
+# JWT signing keys (secrets)
+/keys
+
+# Uploaded files
+/uploads
+!uploads/.gitkeep
+
 .npmrc
 
 # temp directory
