@@ -1,15 +1,14 @@
 import { CorsOptions } from 'cors';
-import 'dotenv/config';
+import env from './env';
 
 const corsOptions: CorsOptions = {
   origin: function (origin, callback) {
-    // Allow requests from any origin in development
-    if (process.env.NODE_ENV === 'development') {
+    if (env.nodeEnv === 'development') {
       callback(null, true);
     } else {
-      // In production, specify allowed origins
-      const allowedOrigins = process.env!.ALLOWED_ORIGINS!.split(',') || [];
-
+      const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
+        .split(',')
+        .filter(Boolean);
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
