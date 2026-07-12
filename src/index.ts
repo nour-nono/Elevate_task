@@ -6,6 +6,9 @@ import helmet from 'helmet';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 
+import authRoutes from './routes/authRoutes';
+import notesRoutes from './routes/notesRoutes';
+
 const app: Application = express();
 const port: number = parseInt(process.env.PORT || '3000');
 
@@ -23,3 +26,12 @@ const limiter = rateLimit({
   legacyHeaders: false,
 });
 app.use(limiter);
+
+// Routes
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/notes', notesRoutes);
+
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+  console.log(`Environment: ${process.env.NODE_ENV}`);
+});
