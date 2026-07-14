@@ -1,37 +1,50 @@
 import 'dotenv/config';
-import express, { Application } from 'express';
-import cors from 'cors';
-import corsOptions from './config/cors';
-import helmet from 'helmet';
-import compression from 'compression';
-import rateLimit from 'express-rate-limit';
+import { createApp } from './app';
+import { connectDB, disconnectDB } from './config/db';
+import env from './config/env';
+import logger from './utils/logger';
+import { getPublicKey } from './utils/jwt';
 
-import authRoutes from './routes/authRoutes';
-import notesRoutes from './routes/notesRoutes';
+async function bootstrap(): Promise<void> {
+  try {
+    getPublicKey();
 
-const app: Application = express();
-const port: number = parseInt(process.env.PORT || '3000');
+    await connectDB();
+    const app = await createApp();
 
-// Middleware
-app.use(compression());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(helmet());
-app.use(cors(corsOptions));
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // 100 requests per window
-  message: 'Too many requests, please try again later',
-  standardHeaders: true, // Return rate limit info in headers
-  legacyHeaders: false,
-});
-app.use(limiter);
+    const server = app.listen(env.port, () => {
+      logger.info(`Server is running on port ${env.port}`);
+      logger.info(`Environment: ${env.nodeEnv}`);
+      logger.info(`GraphQL endpoint: http://localhost:${env.port}/graphql`);
+      logger.info(`REST API base: http://localhost:${env.port}/api/v1`);
+    });
 
-// Routes
-app.use('/api/v1/auth', authRoutes);
-app.use('/api/v1/notes', notesRoutes);
+    const shutdown = async (signal: string) => {
+      logger.info(`${signal} received. Shutting down gracefully...`);
+      server.close(async () => {
+        await disconnectDB();
+        process.exit(0);
+      });
+      setTimeout(() => {
+        logger.error('Forcing shutdown after timeout');
+        process.exit(1);
+      }, 10000).unref();
+    };
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-  console.log(`Environment: ${process.env.NODE_ENV}`);
-});
+    process.on('SIGTERM', () => shutdown('SIGTERM'));
+    process.on('SIGINT', () => shutdown('SIGINT'));
+
+    process.on('unhandledRejection', (reason) => {
+      logger.error('Unhandled Rejection:', reason);
+    });
+    process.on('uncaughtException', (err) => {
+      logger.error('Uncaught Exception:', err);
+      process.exit(1);
+    });
+  } catch (err) {
+    logger.error('Failed to start server:', err);
+    process.exit(1);
+  }
+}
+
+bootstrap();
