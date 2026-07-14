@@ -79,10 +79,32 @@ export const uploadProfilePic = asyncWrapper(
   },
 );
 
-export const forgetPassword = asyncWrapper(async (req, res, next) => {});
+export const forgetPassword = asyncWrapper(
+  async (req: Request, res: Response, _next: NextFunction) => {
+    const { email } = req.body;
+    await passwordService.forgotPassword(email);
 
-// reset password
-export const resetPassword = asyncWrapper(async (req, res, next) => {});
+    res.status(HttpStatus.OK).json({
+      success: true,
+      message:
+        'If an account exists for that email, a password reset code has been sent.',
+    });
+  },
+);
+
+export const resetPassword = asyncWrapper(
+  async (req: Request, res: Response, _next: NextFunction) => {
+    const { email, otp, newPassword } = req.body;
+    await passwordService.resetPassword(email, otp, newPassword);
+
+    res.status(HttpStatus.OK).json({
+      success: true,
+      message:
+        'Password reset successfully. You can now log in with your new password.',
+    });
+  },
+);
+
 export const getProfile = asyncWrapper(
   async (req: Request, res: Response, _next: NextFunction) => {
     if (!req.user) {
