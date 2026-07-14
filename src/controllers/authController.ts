@@ -36,10 +36,7 @@ export const loginUser = asyncWrapper(
 
 export const logoutUser = asyncWrapper(
   async (req: Request, res: Response, _next: NextFunction) => {
-    if (!req.user) {
-      throw ApiError.unauthorized('Authentication required');
-    }
-    const { jti, userId, exp } = req.user;
+    const { jti, userId, exp } = req.user!;
     await authService.logout(jti, userId, exp as number);
 
     res.status(HttpStatus.OK).json({
@@ -51,9 +48,6 @@ export const logoutUser = asyncWrapper(
 
 export const uploadProfilePic = asyncWrapper(
   async (req: Request, res: Response, _next: NextFunction) => {
-    if (!req.user) {
-      throw ApiError.unauthorized('Authentication required');
-    }
     if (!req.file) {
       throw ApiError.badRequest(
         'No image file uploaded. Use the "profilePic" field.',
@@ -64,7 +58,7 @@ export const uploadProfilePic = asyncWrapper(
       .replace(/\\/g, '/');
 
     const updatedUser = await userService.updateProfilePic(
-      req.user.userId,
+      req.user!.userId,
       filePath,
     );
 
@@ -107,10 +101,7 @@ export const resetPassword = asyncWrapper(
 
 export const getProfile = asyncWrapper(
   async (req: Request, res: Response, _next: NextFunction) => {
-    if (!req.user) {
-      throw ApiError.unauthorized('Authentication required');
-    }
-    const user = await authService.getAuthenticatedUser(req.user.userId);
+    const user = await authService.getAuthenticatedUser(req.user!.userId);
 
     res.status(HttpStatus.OK).json({
       success: true,

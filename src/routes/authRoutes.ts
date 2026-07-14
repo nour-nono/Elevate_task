@@ -9,6 +9,7 @@ import {
   getProfile,
 } from '../controllers/authController';
 import authenticate from '../middlewares/auth';
+import requireUser from '../middlewares/requireUser';
 import validate from '../middlewares/validate';
 import { uploadProfilePic as uploadMiddleware } from '../middlewares/upload';
 import {
@@ -24,11 +25,11 @@ router.route('/register').post(validate(registerSchema), registerUser);
 
 router.route('/login').post(validate(loginSchema), loginUser);
 
-router.route('/logout').post(authenticate, logoutUser);
+router.route('/logout').post(authenticate, requireUser, logoutUser);
 
 router
   .route('/upload-profile-pic')
-  .patch(authenticate, uploadMiddleware, uploadProfilePic);
+  .patch(authenticate, requireUser, uploadMiddleware, uploadProfilePic);
 
 router
   .route('/forget-password')
@@ -38,6 +39,6 @@ router
   .route('/reset-password')
   .post(validate(resetPasswordSchema), resetPassword);
 
-router.route('/profile').get(authenticate, getProfile);
+router.route('/profile').get(authenticate, requireUser, getProfile);
 
 export default router;
