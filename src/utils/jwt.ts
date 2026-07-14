@@ -22,13 +22,19 @@ function loadKey(absolutePath: string, label: string): string {
 
 export function getPrivateKey(): string {
   if (cachedPrivateKey) return cachedPrivateKey;
-  cachedPrivateKey = loadKey(path.resolve(projectRoot, env.jwt.privateKeyPath), 'JWT private key');
+  cachedPrivateKey = loadKey(
+    path.resolve(projectRoot, env.jwt.privateKeyPath),
+    'JWT private key',
+  );
   return cachedPrivateKey;
 }
 
 export function getPublicKey(): string {
   if (cachedPublicKey) return cachedPublicKey;
-  cachedPublicKey = loadKey(path.resolve(projectRoot, env.jwt.publicKeyPath), 'JWT public key');
+  cachedPublicKey = loadKey(
+    path.resolve(projectRoot, env.jwt.publicKeyPath),
+    'JWT public key',
+  );
   return cachedPublicKey;
 }
 
@@ -61,7 +67,8 @@ export function verifyAccessToken(token: string): DecodedToken {
     }) as DecodedToken;
     return decoded;
   } catch (err) {
-    const message = err instanceof jwt.TokenExpiredError ? 'Token expired' : 'Invalid token';
+    const message =
+      err instanceof jwt.TokenExpiredError ? 'Token expired' : 'Invalid token';
     throw new ApiError(message, HttpStatus.UNAUTHORIZED);
   }
 }

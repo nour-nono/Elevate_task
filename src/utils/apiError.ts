@@ -39,7 +39,9 @@ export class ApiError extends Error {
     return new ApiError(message, HttpStatus.CONFLICT, true);
   }
 
-  static tooManyRequests(message = 'Too many requests, please try again later'): ApiError {
+  static tooManyRequests(
+    message = 'Too many requests, please try again later',
+  ): ApiError {
     return new ApiError(message, HttpStatus.TOO_MANY_REQUESTS, true);
   }
 

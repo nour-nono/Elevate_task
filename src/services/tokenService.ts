@@ -26,8 +26,13 @@ class TokenService {
     return verifyAccessToken(token);
   }
 
-  async revoke(jti: string, userId: string, expiresAt: number | Date): Promise<void> {
-    const expDate = expiresAt instanceof Date ? expiresAt : new Date(expiresAt * 1000);
+  async revoke(
+    jti: string,
+    userId: string,
+    expiresAt: number | Date,
+  ): Promise<void> {
+    const expDate =
+      expiresAt instanceof Date ? expiresAt : new Date(expiresAt * 1000);
     await revokedTokenRepository.revoke(jti, userId, expDate);
   }
 

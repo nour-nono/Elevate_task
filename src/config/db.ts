@@ -13,7 +13,9 @@ export async function connectDB(): Promise<typeof mongoose> {
   });
 
   isConnected = true;
-  console.log(`MongoDB connected: ${connection.connection.host}/${connection.connection.name}`);
+  console.log(
+    `MongoDB connected: ${connection.connection.host}/${connection.connection.name}`,
+  );
   return mongoose;
 }
 

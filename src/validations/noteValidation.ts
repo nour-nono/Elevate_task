@@ -13,13 +13,9 @@ export const createNoteSchema = Joi.object({
 });
 
 export const deleteNoteSchema = Joi.object({
-  id: Joi.string()
-    .hex()
-    .length(24)
-    .required()
-    .messages({
-      'string.hex': 'Note ID must be a valid ObjectId',
-      'string.length': 'Note ID must be a valid ObjectId',
-      'any.required': 'Note ID is required',
-    }),
+  id: Joi.string().hex().length(24).required().messages({
+    'string.hex': 'Note ID must be a valid ObjectId',
+    'string.length': 'Note ID must be a valid ObjectId',
+    'any.required': 'Note ID is required',
+  }),
 });
